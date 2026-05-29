@@ -1,7 +1,7 @@
 {
   "name": "Button Tracker",
   "short_name": "Tracker",
-  "start_url": "/",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#f2f2f7",
   "theme_color": "#ffffff",
