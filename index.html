@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Tracker">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+  <title>Tracker</title>
+</head>
+<body>
+  <div class="app">
+    <nav class="tabs">
+      <button class="tab active" data-page="main">Buttons</button>
+      <button class="tab" data-page="log">Log</button>
+      <button class="tab" data-page="export">Export</button>
+    </nav>
+
+    <main id="page-main" class="page active">
+      <div class="buttons">
+        <button class="btn btn-red" onclick="logPress('red')">Red</button>
+        <button class="btn btn-green" onclick="logPress('green')">Green</button>
+      </div>
+    </main>
+
+    <section id="page-log" class="page">
+      <table id="log-table" class="hidden">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th class="red-cell">Red</th>
+            <th class="green-cell">Green</th>
+          </tr>
+        </thead>
+        <tbody id="log-body"></tbody>
+      </table>
+      <p id="empty-msg" class="empty">No presses logged yet.</p>
+    </section>
+    <section id="page-export" class="page">
+      <p id="export-count" class="export-count"></p>
+      <button class="export-btn" onclick="exportCSV()">Export CSV</button>
+      <p id="export-empty" class="empty hidden">No data to export yet.</p>
+    </section>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
