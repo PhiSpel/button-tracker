@@ -1,32 +1,48 @@
-const STORAGE_KEY = 'button_log';
+const DB_NAME = 'tracker';
+const STORE = 'presses';
+
+const dbPromise = new Promise((resolve, reject) => {
+  const req = indexedDB.open(DB_NAME, 1);
+  req.onupgradeneeded = e => {
+    e.target.result.createObjectStore(STORE, { autoIncrement: true });
+  };
+  req.onsuccess = () => resolve(req.result);
+  req.onerror = () => reject(req.error);
+});
+
+function addEntry(entry) {
+  return dbPromise.then(db => new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE, 'readwrite');
+    tx.objectStore(STORE).add(entry);
+    tx.oncomplete = resolve;
+    tx.onerror = () => reject(tx.error);
+  }));
+}
+
+function getAllEntries() {
+  return dbPromise.then(db => new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE, 'readonly');
+    const req = tx.objectStore(STORE).getAll();
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  }));
+}
 
 function logPress(color) {
   const now = new Date();
-  const entry = {
-    date: now.toLocaleDateString('en-CA'),
-    time: now.toLocaleTimeString(),
-    button: color,
-  };
-  const log = getLog();
-  log.push(entry);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(log));
-
   const btn = document.querySelector(`.btn-${color}`);
   btn.classList.add('pressed');
   setTimeout(() => btn.classList.remove('pressed'), 150);
+
+  addEntry({
+    date: now.toLocaleDateString('en-CA'),
+    time: now.toLocaleTimeString(),
+    button: color,
+  }).catch(err => console.error('Failed to save:', err));
 }
 
-function getLog() {
-  try {
-    const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-}
-
-function renderTable() {
-  const log = getLog();
+async function renderTable() {
+  const log = await getAllEntries();
   const byDate = {};
 
   for (const entry of log) {
@@ -70,8 +86,8 @@ function renderTable() {
   }
 }
 
-function renderExport() {
-  const log = getLog();
+async function renderExport() {
+  const log = await getAllEntries();
   const count = document.getElementById('export-count');
   const btn = document.querySelector('.export-btn');
   const empty = document.getElementById('export-empty');
@@ -88,8 +104,8 @@ function renderExport() {
   }
 }
 
-function exportCSV() {
-  const log = getLog();
+async function exportCSV() {
+  const log = await getAllEntries();
   if (log.length === 0) return;
 
   const rows = [['Date', 'Time', 'Button']];
