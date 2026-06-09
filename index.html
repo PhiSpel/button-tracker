@@ -20,9 +20,10 @@
 
     <main id="page-main" class="page active">
       <div class="buttons">
-        <button class="btn btn-red" onclick="logPress('red')">Red</button>
-        <button class="btn btn-green" onclick="logPress('green')">Green</button>
+        <button class="btn btn-red" onclick="logPress('red')"></button>
+        <button class="btn btn-green" onclick="logPress('green')"></button>
       </div>
+      <textarea id="comment-input" class="comment-input" placeholder="Comment (optional)"></textarea>
     </main>
 
     <section id="page-log" class="page">
@@ -32,6 +33,7 @@
             <th>Date</th>
             <th class="red-cell">Red</th>
             <th class="green-cell">Green</th>
+            <th>Comments</th>
           </tr>
         </thead>
         <tbody id="log-body"></tbody>
