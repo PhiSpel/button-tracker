@@ -34,10 +34,15 @@ function logPress(color) {
   btn.classList.add('pressed');
   setTimeout(() => btn.classList.remove('pressed'), 150);
 
+  const commentEl = document.getElementById('comment-input');
+  const comment = commentEl.value.trim();
+  commentEl.value = '';
+
   addEntry({
     date: now.toLocaleDateString('en-CA'),
     time: now.toLocaleTimeString(),
     button: color,
+    comment,
   }).catch(err => console.error('Failed to save:', err));
 }
 
@@ -104,13 +109,20 @@ async function renderExport() {
   }
 }
 
+function csvCell(val) {
+  const s = val == null ? '' : String(val);
+  return (s.includes(',') || s.includes('"') || s.includes('\n'))
+    ? '"' + s.replace(/"/g, '""') + '"'
+    : s;
+}
+
 async function exportCSV() {
   const log = await getAllEntries();
   if (log.length === 0) return;
 
-  const rows = [['Date', 'Time', 'Button']];
+  const rows = [['Date', 'Time', 'Button', 'Comment']];
   for (const entry of log) {
-    rows.push([entry.date, entry.time, entry.button]);
+    rows.push([entry.date, entry.time, entry.button, entry.comment ?? ''].map(csvCell));
   }
   const csv = rows.map(r => r.join(',')).join('\n');
   const file = new File([csv], 'button-log.csv', { type: 'text/csv' });
