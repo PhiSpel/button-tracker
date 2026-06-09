@@ -1,4 +1,4 @@
-const CACHE = 'tracker-v3';
+const CACHE = 'tracker-v4';
 const FILES = ['/index.html', '/style.css', '/app.js', '/manifest.json'];
 
 self.addEventListener('install', e => {
@@ -20,6 +20,10 @@ self.addEventListener('fetch', e => {
     return;
   }
   e.respondWith(
-    caches.match(e.request).then(r => r || fetch(e.request))
+    fetch(e.request).then(response => {
+      const clone = response.clone();
+      caches.open(CACHE).then(c => c.put(e.request, clone));
+      return response;
+    }).catch(() => caches.match(e.request))
   );
 });
