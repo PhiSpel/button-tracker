@@ -47,6 +47,54 @@ function logPress(color) {
   }).catch(err => console.error('Failed to save:', err));
 }
 
+function parseHour(timeStr) {
+  if (!timeStr) return null;
+  const m12 = timeStr.match(/(\d{1,2}):\d{2}(?::\d{2})?\s*(AM|PM)/i);
+  if (m12) {
+    let h = parseInt(m12[1], 10);
+    if (m12[2].toUpperCase() === 'AM' && h === 12) h = 0;
+    if (m12[2].toUpperCase() === 'PM' && h !== 12) h += 12;
+    return h;
+  }
+  const m24 = timeStr.match(/^(\d{1,2}):\d{2}/);
+  return m24 ? parseInt(m24[1], 10) : null;
+}
+
+const HOUR_BUCKETS = [0, 3, 6, 9, 12, 15, 18, 21];
+
+function fillHourlyTable(bodyId, entries) {
+  const totals = Object.fromEntries(HOUR_BUCKETS.map(b => [b, { red: 0, green: 0 }]));
+  const days = new Set(entries.map(e => e.date));
+
+  for (const entry of entries) {
+    const h = parseHour(entry.time);
+    if (h === null) continue;
+    const bucket = Math.floor(h / 3) * 3;
+    if (entry.button === 'red') totals[bucket].red++;
+    else if (entry.button === 'green') totals[bucket].green++;
+  }
+
+  const n = days.size || 1;
+  const tbody = document.getElementById(bodyId);
+  tbody.innerHTML = '';
+
+  for (const b of HOUR_BUCKETS) {
+    const h1 = String(b).padStart(2, '0');
+    const h2 = String(b + 2).padStart(2, '0');
+    const tr = document.createElement('tr');
+    const tCell = document.createElement('td');
+    tCell.textContent = `${h1}:00–${h2}:59`;
+    const rCell = document.createElement('td');
+    rCell.className = 'red-cell';
+    rCell.textContent = (totals[b].red / n).toFixed(2);
+    const gCell = document.createElement('td');
+    gCell.className = 'green-cell';
+    gCell.textContent = (totals[b].green / n).toFixed(2);
+    tr.append(tCell, rCell, gCell);
+    tbody.appendChild(tr);
+  }
+}
+
 async function renderTable() {
   const log = await getAllEntries();
   const byDate = {};
@@ -68,6 +116,9 @@ async function renderTable() {
 
   if (dates.length === 0) {
     table.classList.add('hidden');
+    ['hourly-table', 'hourly-weekday-table', 'hourly-weekend-table'].forEach(id =>
+      document.getElementById(id).classList.add('hidden')
+    );
     empty.classList.remove('hidden');
     return;
   }
@@ -93,6 +144,29 @@ async function renderTable() {
     const tr = document.createElement('tr');
     tr.append(dateCell, redCell, greenCell, commentsCell);
     tbody.appendChild(tr);
+  }
+
+  // 3-hourly tables
+  const weekdays = log.filter(e => { const d = new Date(e.date).getDay(); return d >= 1 && d <= 5; });
+  const weekends = log.filter(e => { const d = new Date(e.date).getDay(); return d === 0 || d === 6; });
+
+  document.getElementById('hourly-table').classList.remove('hidden');
+  fillHourlyTable('hourly-body', log);
+
+  const weekdayTable = document.getElementById('hourly-weekday-table');
+  if (weekdays.length > 0) {
+    weekdayTable.classList.remove('hidden');
+    fillHourlyTable('hourly-weekday-body', weekdays);
+  } else {
+    weekdayTable.classList.add('hidden');
+  }
+
+  const weekendTable = document.getElementById('hourly-weekend-table');
+  if (weekends.length > 0) {
+    weekendTable.classList.remove('hidden');
+    fillHourlyTable('hourly-weekend-body', weekends);
+  } else {
+    weekendTable.classList.add('hidden');
   }
 }
 

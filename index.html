@@ -27,17 +27,63 @@
     </main>
 
     <section id="page-log" class="page">
-      <table id="log-table" class="hidden">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th class="red-cell">Red</th>
-            <th class="green-cell">Green</th>
-            <th>Comments</th>
-          </tr>
-        </thead>
-        <tbody id="log-body"></tbody>
-      </table>
+      <details class="log-section" open>
+        <summary>Daily logs</summary>
+        <table id="log-table" class="hidden">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th class="red-cell">Red</th>
+              <th class="green-cell">Green</th>
+              <th>Comments</th>
+            </tr>
+          </thead>
+          <tbody id="log-body"></tbody>
+        </table>
+      </details>
+
+      <details class="log-section">
+        <summary>3-Hourly</summary>
+        <table id="hourly-table" class="hidden">
+          <thead>
+            <tr>
+              <th>Time slot</th>
+              <th class="red-cell">Avg Red</th>
+              <th class="green-cell">Avg Green</th>
+            </tr>
+          </thead>
+          <tbody id="hourly-body"></tbody>
+        </table>
+      </details>
+
+      <details class="log-section">
+        <summary>3-hourly weekdays</summary>
+        <table id="hourly-weekday-table" class="hidden">
+          <thead>
+            <tr>
+              <th>Time slot</th>
+              <th class="red-cell">Avg Red</th>
+              <th class="green-cell">Avg Green</th>
+            </tr>
+          </thead>
+          <tbody id="hourly-weekday-body"></tbody>
+        </table>
+      </details>
+
+      <details class="log-section">
+        <summary>3-hourly weekends</summary>
+        <table id="hourly-weekend-table" class="hidden">
+          <thead>
+            <tr>
+              <th>Time slot</th>
+              <th class="red-cell">Avg Red</th>
+              <th class="green-cell">Avg Green</th>
+            </tr>
+          </thead>
+          <tbody id="hourly-weekend-body"></tbody>
+        </table>
+      </details>
+
       <p id="empty-msg" class="empty">No presses logged yet.</p>
     </section>
     <section id="page-export" class="page">
