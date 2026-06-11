@@ -79,11 +79,9 @@ function fillHourlyTable(bodyId, entries) {
   tbody.innerHTML = '';
 
   for (const b of HOUR_BUCKETS) {
-    const h1 = String(b).padStart(2, '0');
-    const h2 = String(b + 2).padStart(2, '0');
     const tr = document.createElement('tr');
     const tCell = document.createElement('td');
-    tCell.textContent = `${h1}:00–${h2}:59`;
+    tCell.textContent = `${b}–${b + 3} h`;
     const rCell = document.createElement('td');
     rCell.className = 'red-cell';
     rCell.textContent = (totals[b].red / n).toFixed(2);
