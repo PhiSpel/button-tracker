@@ -93,6 +93,9 @@ function fillHourlyTable(bodyId, entries) {
     const cCell = document.createElement('td');
     const commented = totals[b].commentEntries;
 
+    tr.append(tCell, rCell, gCell, cCell);
+    tbody.appendChild(tr);
+
     if (commented.length > 0) {
       cCell.textContent = commented.length;
       cCell.className = 'comment-toggle';
@@ -127,14 +130,16 @@ function fillHourlyTable(bodyId, entries) {
         cCell.classList.toggle('open', opening);
       });
 
-      tr.append(tCell, rCell, gCell, cCell);
-      tbody.appendChild(tr);
       detailRows.forEach(r => tbody.appendChild(r));
-    } else {
-      tr.append(tCell, rCell, gCell, cCell);
-      tbody.appendChild(tr);
     }
   }
+}
+
+function renderHourlySection(tableId, bodyId, emptyId, entries) {
+  const hasData = entries.length > 0;
+  document.getElementById(tableId).classList.toggle('hidden', !hasData);
+  if (emptyId) document.getElementById(emptyId).classList.toggle('hidden', hasData);
+  if (hasData) fillHourlyTable(bodyId, entries);
 }
 
 async function renderTable() {
@@ -189,33 +194,15 @@ async function renderTable() {
   }
 
   // 3-hourly tables
-  const weekdays = log.filter(e => { const d = new Date(e.date).getDay(); return d >= 1 && d <= 5; });
-  const weekends = log.filter(e => { const d = new Date(e.date).getDay(); return d === 0 || d === 6; });
-
-  document.getElementById('hourly-table').classList.remove('hidden');
-  fillHourlyTable('hourly-body', log);
-
-  const weekdayTable = document.getElementById('hourly-weekday-table');
-  const weekdayEmpty = document.getElementById('hourly-weekday-empty');
-  if (weekdays.length > 0) {
-    weekdayTable.classList.remove('hidden');
-    weekdayEmpty.classList.add('hidden');
-    fillHourlyTable('hourly-weekday-body', weekdays);
-  } else {
-    weekdayTable.classList.add('hidden');
-    weekdayEmpty.classList.remove('hidden');
+  const weekdays = [], weekends = [];
+  for (const e of log) {
+    const d = new Date(e.date).getDay();
+    if (d >= 1 && d <= 5) weekdays.push(e); else weekends.push(e);
   }
 
-  const weekendTable = document.getElementById('hourly-weekend-table');
-  const weekendEmpty = document.getElementById('hourly-weekend-empty');
-  if (weekends.length > 0) {
-    weekendTable.classList.remove('hidden');
-    weekendEmpty.classList.add('hidden');
-    fillHourlyTable('hourly-weekend-body', weekends);
-  } else {
-    weekendTable.classList.add('hidden');
-    weekendEmpty.classList.remove('hidden');
-  }
+  renderHourlySection('hourly-table', 'hourly-body', null, log);
+  renderHourlySection('hourly-weekday-table', 'hourly-weekday-body', 'hourly-weekday-empty', weekdays);
+  renderHourlySection('hourly-weekend-table', 'hourly-weekend-body', 'hourly-weekend-empty', weekends);
 }
 
 async function renderExport() {
