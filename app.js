@@ -85,10 +85,14 @@ function fillHourlyTable(bodyId, entries) {
     tCell.textContent = `${b}–${b + 3} h`;
     const rCell = document.createElement('td');
     rCell.className = 'red-cell';
-    rCell.textContent = (totals[b].red / n).toFixed(2);
+    rCell.textContent = totals[b].red
+      ? `${totals[b].red} (${(totals[b].red / n).toFixed(2)})`
+      : '0';
     const gCell = document.createElement('td');
     gCell.className = 'green-cell';
-    gCell.textContent = (totals[b].green / n).toFixed(2);
+    gCell.textContent = totals[b].green
+      ? `${totals[b].green} (${(totals[b].green / n).toFixed(2)})`
+      : '0';
 
     const cCell = document.createElement('td');
     const commented = totals[b].commentEntries;
