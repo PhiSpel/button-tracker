@@ -63,7 +63,7 @@ function parseHour(timeStr) {
 const HOUR_BUCKETS = [0, 3, 6, 9, 12, 15, 18, 21];
 
 function fillHourlyTable(bodyId, entries) {
-  const totals = Object.fromEntries(HOUR_BUCKETS.map(b => [b, { red: 0, green: 0 }]));
+  const totals = Object.fromEntries(HOUR_BUCKETS.map(b => [b, { red: 0, green: 0, commentEntries: [] }]));
   const days = new Set(entries.map(e => e.date));
 
   for (const entry of entries) {
@@ -72,6 +72,7 @@ function fillHourlyTable(bodyId, entries) {
     const bucket = Math.floor(h / 3) * 3;
     if (entry.button === 'red') totals[bucket].red++;
     else if (entry.button === 'green') totals[bucket].green++;
+    if (entry.comment) totals[bucket].commentEntries.push(entry);
   }
 
   const n = days.size || 1;
@@ -88,7 +89,32 @@ function fillHourlyTable(bodyId, entries) {
     const gCell = document.createElement('td');
     gCell.className = 'green-cell';
     gCell.textContent = (totals[b].green / n).toFixed(2);
-    tr.append(tCell, rCell, gCell);
+
+    const cCell = document.createElement('td');
+    const commented = totals[b].commentEntries;
+    if (commented.length > 0) {
+      const details = document.createElement('details');
+      details.className = 'comment-details';
+      const summary = document.createElement('summary');
+      summary.textContent = commented.length;
+      details.appendChild(summary);
+      const list = document.createElement('ul');
+      list.className = 'comment-list';
+      for (const e of commented) {
+        const li = document.createElement('li');
+        const meta = document.createElement('span');
+        meta.className = 'comment-meta';
+        meta.textContent = `${e.date} ${e.time}`;
+        const text = document.createElement('span');
+        text.textContent = e.comment;
+        li.append(meta, text);
+        list.appendChild(li);
+      }
+      details.appendChild(list);
+      cCell.appendChild(details);
+    }
+
+    tr.append(tCell, rCell, gCell, cCell);
     tbody.appendChild(tr);
   }
 }
