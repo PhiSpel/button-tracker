@@ -196,19 +196,25 @@ async function renderTable() {
   fillHourlyTable('hourly-body', log);
 
   const weekdayTable = document.getElementById('hourly-weekday-table');
+  const weekdayEmpty = document.getElementById('hourly-weekday-empty');
   if (weekdays.length > 0) {
     weekdayTable.classList.remove('hidden');
+    weekdayEmpty.classList.add('hidden');
     fillHourlyTable('hourly-weekday-body', weekdays);
   } else {
     weekdayTable.classList.add('hidden');
+    weekdayEmpty.classList.remove('hidden');
   }
 
   const weekendTable = document.getElementById('hourly-weekend-table');
+  const weekendEmpty = document.getElementById('hourly-weekend-empty');
   if (weekends.length > 0) {
     weekendTable.classList.remove('hidden');
+    weekendEmpty.classList.add('hidden');
     fillHourlyTable('hourly-weekend-body', weekends);
   } else {
     weekendTable.classList.add('hidden');
+    weekendEmpty.classList.remove('hidden');
   }
 }
 
