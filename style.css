@@ -164,53 +164,40 @@ body {
   margin-top: 8px;
 }
 
-.comment-details > summary {
+.comment-toggle {
   cursor: pointer;
-  list-style: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  -webkit-tap-highlight-color: transparent;
   user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  white-space: nowrap;
 }
 
-.comment-details > summary::-webkit-details-marker {
-  display: none;
-}
-
-.comment-details > summary::after {
-  content: '▶';
+.comment-toggle::after {
+  content: ' ▶';
   font-size: 8px;
   color: #aeaeb2;
-  transition: transform 0.2s ease;
   display: inline-block;
+  transition: transform 0.2s ease;
+  margin-left: 4px;
 }
 
-.comment-details[open] > summary::after {
+.comment-toggle.open::after {
   transform: rotate(90deg);
 }
 
-.comment-list {
-  list-style: none;
-  margin: 6px 0 2px;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+.comment-row {
+  background: #f9f9fb;
 }
 
-.comment-list li {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  padding-top: 6px;
-  border-top: 1px solid #e5e5ea;
-  font-size: 13px;
-}
-
-.comment-meta {
-  font-size: 11px;
+.comment-time {
+  font-size: 12px;
   color: #aeaeb2;
+  padding-left: 28px !important;
+}
+
+.comment-text {
+  font-size: 13px;
+  font-style: italic;
+  color: #3c3c43;
 }
 
 table {
