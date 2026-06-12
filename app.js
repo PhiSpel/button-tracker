@@ -92,30 +92,48 @@ function fillHourlyTable(bodyId, entries) {
 
     const cCell = document.createElement('td');
     const commented = totals[b].commentEntries;
-    if (commented.length > 0) {
-      const details = document.createElement('details');
-      details.className = 'comment-details';
-      const summary = document.createElement('summary');
-      summary.textContent = commented.length;
-      details.appendChild(summary);
-      const list = document.createElement('ul');
-      list.className = 'comment-list';
-      for (const e of commented) {
-        const li = document.createElement('li');
-        const meta = document.createElement('span');
-        meta.className = 'comment-meta';
-        meta.textContent = `${e.date} ${e.time}`;
-        const text = document.createElement('span');
-        text.textContent = e.comment;
-        li.append(meta, text);
-        list.appendChild(li);
-      }
-      details.appendChild(list);
-      cCell.appendChild(details);
-    }
 
-    tr.append(tCell, rCell, gCell, cCell);
-    tbody.appendChild(tr);
+    if (commented.length > 0) {
+      cCell.textContent = commented.length;
+      cCell.className = 'comment-toggle';
+
+      const detailRows = commented.map(e => {
+        const dtr = document.createElement('tr');
+        dtr.className = 'comment-row hidden';
+
+        const dtCell = document.createElement('td');
+        dtCell.textContent = `${e.date} ${e.time}`;
+        dtCell.className = 'comment-time';
+
+        const drCell = document.createElement('td');
+        drCell.className = 'red-cell';
+        if (e.button === 'red') drCell.textContent = '×';
+
+        const dgCell = document.createElement('td');
+        dgCell.className = 'green-cell';
+        if (e.button === 'green') dgCell.textContent = '×';
+
+        const dcCell = document.createElement('td');
+        dcCell.textContent = e.comment;
+        dcCell.className = 'comment-text';
+
+        dtr.append(dtCell, drCell, dgCell, dcCell);
+        return dtr;
+      });
+
+      cCell.addEventListener('click', () => {
+        const opening = detailRows[0].classList.contains('hidden');
+        detailRows.forEach(r => r.classList.toggle('hidden', !opening));
+        cCell.classList.toggle('open', opening);
+      });
+
+      tr.append(tCell, rCell, gCell, cCell);
+      tbody.appendChild(tr);
+      detailRows.forEach(r => tbody.appendChild(r));
+    } else {
+      tr.append(tCell, rCell, gCell, cCell);
+      tbody.appendChild(tr);
+    }
   }
 }
 
