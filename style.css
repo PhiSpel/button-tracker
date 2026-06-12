@@ -124,6 +124,89 @@ body {
   padding: 16px;
 }
 
+.log-section {
+  margin-bottom: 12px;
+}
+
+.log-section > summary {
+  cursor: pointer;
+  padding: 8px 2px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6e6e73;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.log-section > summary::-webkit-details-marker {
+  display: none;
+}
+
+.log-section > summary::before {
+  content: '▶';
+  font-size: 9px;
+  color: #aeaeb2;
+  transition: transform 0.2s ease;
+  display: inline-block;
+}
+
+.log-section[open] > summary::before {
+  transform: rotate(90deg);
+}
+
+.log-section > table {
+  margin-top: 8px;
+}
+
+.section-empty {
+  text-align: center;
+  color: #aeaeb2;
+  font-size: 14px;
+  padding: 16px 0 8px;
+}
+
+.comment-toggle {
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  white-space: nowrap;
+}
+
+.comment-toggle::after {
+  content: ' ▶';
+  font-size: 8px;
+  color: #aeaeb2;
+  display: inline-block;
+  transition: transform 0.2s ease;
+  margin-left: 4px;
+}
+
+.comment-toggle.open::after {
+  transform: rotate(90deg);
+}
+
+.comment-row {
+  background: #f9f9fb;
+}
+
+.comment-time {
+  font-size: 12px;
+  color: #aeaeb2;
+  padding-left: 28px !important;
+}
+
+.comment-text {
+  font-size: 13px;
+  font-style: italic;
+  color: #3c3c43;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
