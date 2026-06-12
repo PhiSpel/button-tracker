@@ -275,3 +275,20 @@ tabs.forEach(tab => {
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js');
 }
+
+document.querySelector('.btn-red').addEventListener('click', () => logPress('red'));
+document.querySelector('.btn-green').addEventListener('click', () => logPress('green'));
+document.querySelector('.export-btn').addEventListener('click', exportCSV);
+
+const helpBtn = document.getElementById('help-btn');
+const modalOverlay = document.getElementById('modal-overlay');
+const modalClose = document.getElementById('modal-close');
+
+helpBtn.addEventListener('click', () => modalOverlay.classList.remove('hidden'));
+modalClose.addEventListener('click', () => modalOverlay.classList.add('hidden'));
+modalOverlay.addEventListener('click', e => {
+  if (e.target === modalOverlay) modalOverlay.classList.add('hidden');
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') modalOverlay.classList.add('hidden');
+});

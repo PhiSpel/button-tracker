@@ -6,6 +6,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Tracker">
+  <meta name="referrer" content="no-referrer">
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="style.css">
   <title>Tracker</title>
@@ -20,8 +21,8 @@
 
     <main id="page-main" class="page active">
       <div class="buttons">
-        <button class="btn btn-red" onclick="logPress('red')"></button>
-        <button class="btn btn-green" onclick="logPress('green')"></button>
+        <button class="btn btn-red"></button>
+        <button class="btn btn-green"></button>
       </div>
       <textarea id="comment-input" class="comment-input" placeholder="Comment (optional)"></textarea>
     </main>
@@ -93,11 +94,36 @@
     </section>
     <section id="page-export" class="page">
       <p id="export-count" class="export-count"></p>
-      <button class="export-btn" onclick="exportCSV()">Export CSV</button>
+      <button class="export-btn">Export CSV</button>
       <p id="export-empty" class="empty hidden">No data to export yet.</p>
     </section>
   </div>
 
+  <button class="help-btn" id="help-btn" aria-label="Help">?</button>
+  <div class="modal-overlay hidden" id="modal-overlay">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <button class="modal-close" id="modal-close" aria-label="Close">✕</button>
+      <h2 id="modal-title">How it works</h2>
+      <p>Button Tracker logs your red and green button presses with a timestamp, stored entirely on this device. No data is ever sent to a server or stored online.</p>
+      <h3>Privacy</h3>
+      <ul>
+        <li>All data is saved locally in your browser.</li>
+        <li>No analytics, no cookies, no tracking of any kind.</li>
+        <li>Each device is independent — your data never leaves your device.</li>
+        <li>The app works fully offline once loaded.</li>
+      </ul>
+      <h3>How to use</h3>
+      <ol>
+        <li>Tap a button to log a press (red or green).</li>
+        <li>Optionally add a comment before pressing.</li>
+        <li>View your history in the <strong>Log</strong> tab.</li>
+        <li>Export as a CSV file from the <strong>Export</strong> tab.</li>
+        <li>Install: use your browser's "Add to Home Screen" option.</li>
+      </ol>
+      <h3>Questions or feedback?</h3>
+      <p><a href="https://github.com/phispel/button-tracker/issues" target="_blank" rel="noopener noreferrer">Open an issue on GitHub</a></p>
+    </div>
+  </div>
   <script src="app.js"></script>
 </body>
 </html>
