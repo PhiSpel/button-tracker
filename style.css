@@ -278,3 +278,113 @@ td {
 .export-btn:active {
   opacity: 0.7;
 }
+
+/* ── Help button ── */
+
+.help-btn {
+  position: fixed;
+  bottom: calc(24px + env(safe-area-inset-bottom));
+  right: 20px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: #e5e5ea;
+  color: #3c3c43;
+  font-size: 20px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.15s;
+  z-index: 100;
+}
+
+.help-btn:active {
+  opacity: 0.6;
+}
+
+/* ── Modal ── */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 200;
+  padding: 16px;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom));
+}
+
+.modal-overlay.hidden {
+  display: none;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 20px;
+  padding: 28px 24px 24px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 80dvh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.modal h2 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.modal h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #6e6e73;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-top: 20px;
+  margin-bottom: 8px;
+}
+
+.modal p {
+  font-size: 15px;
+  line-height: 1.5;
+  color: #3c3c43;
+}
+
+.modal ul,
+.modal ol {
+  padding-left: 20px;
+  font-size: 15px;
+  line-height: 1.7;
+  color: #3c3c43;
+}
+
+.modal a {
+  color: #000;
+  font-weight: 600;
+}
+
+.modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  background: #e5e5ea;
+  color: #3c3c43;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+}
