@@ -420,6 +420,14 @@ async function exportPdfReport() {
   report.append(...buildPdfReport(log));
 
   document.body.classList.add('printing-report');
+
+  // Give the browser a chance to paint the new layout before printing —
+  // calling window.print() synchronously right after the DOM mutation can
+  // make some browsers (e.g. Firefox) snapshot the page for the actual
+  // print/PDF output before the change has taken effect, even though the
+  // print preview itself re-renders live.
+  await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
   window.print();
 }
 
