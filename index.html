@@ -95,6 +95,7 @@
     <section id="page-export" class="page">
       <p id="export-count" class="export-count"></p>
       <div class="export-buttons">
+        <button class="export-btn" data-export="pdf-report">Print Overview</button>
         <button class="export-btn" data-export="raw">Export Raw Log CSV</button>
         <button class="export-btn" data-export="daily">Export Daily Logs CSV</button>
         <button class="export-btn" data-export="hourly">Export 3-Hourly CSV</button>
@@ -104,6 +105,8 @@
       <p id="export-empty" class="empty hidden">No data to export yet.</p>
     </section>
   </div>
+
+  <div id="pdf-report"></div>
 
   <button class="help-btn" id="help-btn" aria-label="Help">?</button>
   <div class="modal-overlay hidden" id="modal-overlay">

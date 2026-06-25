@@ -291,6 +291,96 @@ function buildHourlyCSV(entries) {
   return rows;
 }
 
+function buildAggregateTable(headers, rows, emptyMessage) {
+  const table = document.createElement('table');
+  const thead = document.createElement('thead');
+  const headRow = document.createElement('tr');
+  for (const h of headers) {
+    const th = document.createElement('th');
+    th.textContent = h;
+    headRow.appendChild(th);
+  }
+  thead.appendChild(headRow);
+  table.appendChild(thead);
+
+  const tbody = document.createElement('tbody');
+  for (const cells of rows) {
+    const tr = document.createElement('tr');
+    cells.forEach((cell, i) => {
+      const td = document.createElement('td');
+      td.textContent = cell;
+      if (i === 1) td.className = 'red-cell';
+      if (i === 2) td.className = 'green-cell';
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  }
+  table.appendChild(tbody);
+
+  if (rows.length === 0) {
+    const p = document.createElement('p');
+    p.className = 'section-empty';
+    p.textContent = emptyMessage;
+    return [table, p];
+  }
+  return [table];
+}
+
+function buildDailySection(log) {
+  const { byDate, dates } = computeDailyTotals(log);
+  const rows = dates.map(date => [date, byDate[date].red, byDate[date].green, byDate[date].comments || '']);
+  return buildAggregateTable(['Date', 'Red', 'Green', 'Comments'], rows, 'No presses logged yet.');
+}
+
+function buildHourlySection(entries, emptyMessage) {
+  const { totals, n } = computeHourlyTotals(entries);
+  const rows = entries.length === 0 ? [] : HOUR_BUCKETS.map(b => {
+    const t = totals[b];
+    return [
+      `${b}–${b + 3} h`,
+      t.red ? `${t.red} (${(t.red / n).toFixed(2)})` : '0',
+      t.green ? `${t.green} (${(t.green / n).toFixed(2)})` : '0',
+      t.commentEntries.length || '',
+    ];
+  });
+  return buildAggregateTable(['Time slot', 'Total Red (Avg)', 'Total Green (Avg)', 'Comments'], rows, emptyMessage);
+}
+
+function buildPdfReport(log) {
+  const { weekdays, weekends } = splitWeekdayWeekend(log);
+  const sections = [
+    ['Daily logs', buildDailySection(log)],
+    ['3-Hourly', buildHourlySection(log, 'No presses logged yet.')],
+    ['3-hourly weekdays', buildHourlySection(weekdays, 'No weekday data yet.')],
+    ['3-hourly weekends', buildHourlySection(weekends, 'No weekend data yet.')],
+  ];
+
+  return sections.map(([title, children]) => {
+    const section = document.createElement('section');
+    section.className = 'pdf-section';
+    const h2 = document.createElement('h2');
+    h2.textContent = title;
+    section.append(h2, ...children);
+    return section;
+  });
+}
+
+async function exportPdfReport() {
+  const log = await getAllEntries();
+  if (log.length === 0) return;
+
+  const report = document.getElementById('pdf-report');
+  report.innerHTML = '';
+  report.append(...buildPdfReport(log));
+
+  document.body.classList.add('printing-report');
+  window.print();
+}
+
+window.addEventListener('afterprint', () => {
+  document.body.classList.remove('printing-report');
+});
+
 async function exportCSV() {
   const log = await getAllEntries();
   if (log.length === 0) return;
@@ -351,6 +441,7 @@ document.querySelector('.btn-red').addEventListener('click', () => logPress('red
 document.querySelector('.btn-green').addEventListener('click', () => logPress('green'));
 
 const EXPORTERS = {
+  'pdf-report': exportPdfReport,
   raw: exportCSV,
   daily: exportDailyCSV,
   hourly: exportHourlyCSV,

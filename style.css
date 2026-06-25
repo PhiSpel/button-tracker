@@ -287,6 +287,39 @@ td {
   opacity: 0.7;
 }
 
+/* ── Print report ── */
+
+#pdf-report {
+  display: none;
+}
+
+#pdf-report .pdf-section {
+  margin-bottom: 24px;
+}
+
+#pdf-report h2 {
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+@media print {
+  body.printing-report > *:not(#pdf-report) {
+    display: none !important;
+  }
+
+  body.printing-report #pdf-report {
+    display: block !important;
+  }
+
+  .pdf-section {
+    break-before: page;
+  }
+
+  .pdf-section:first-child {
+    break-before: auto;
+  }
+}
+
 /* ── Help button ── */
 
 .help-btn {
