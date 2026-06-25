@@ -303,6 +303,12 @@ td {
 }
 
 @media print {
+  html, body {
+    height: auto !important;
+    display: block !important;
+    overflow: visible !important;
+  }
+
   body.printing-report > *:not(#pdf-report) {
     display: none !important;
   }
