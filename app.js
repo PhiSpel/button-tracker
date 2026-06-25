@@ -432,7 +432,15 @@ async function exportPdfReport() {
 }
 
 window.addEventListener('afterprint', () => {
-  document.body.classList.remove('printing-report');
+  // Firefox fires 'afterprint' as soon as the print dialog closes, but the
+  // actual PDF file (when "Save to PDF" is chosen) is rendered asynchronously
+  // afterwards. Removing the printing-report class right away can make that
+  // later render pass run against the normal screen layout instead of the
+  // report, producing a PDF of the export page plus blank pages. Delay the
+  // cleanup so the async render has time to use the correct layout.
+  setTimeout(() => {
+    document.body.classList.remove('printing-report');
+  }, 2000);
 });
 
 async function exportCSV() {
