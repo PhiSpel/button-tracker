@@ -291,8 +291,7 @@ function buildHourlyCSV(entries) {
   return rows;
 }
 
-function buildAggregateTable(headers, rows, emptyMessage) {
-  const table = document.createElement('table');
+function buildTableHead(headers) {
   const thead = document.createElement('thead');
   const headRow = document.createElement('tr');
   for (const h of headers) {
@@ -301,7 +300,12 @@ function buildAggregateTable(headers, rows, emptyMessage) {
     headRow.appendChild(th);
   }
   thead.appendChild(headRow);
-  table.appendChild(thead);
+  return thead;
+}
+
+function buildAggregateTable(headers, rows, emptyMessage) {
+  const table = document.createElement('table');
+  table.appendChild(buildTableHead(headers));
 
   const tbody = document.createElement('tbody');
   for (const cells of rows) {
@@ -332,18 +336,60 @@ function buildDailySection(log) {
   return buildAggregateTable(['Date', 'Red', 'Green', 'Comments'], rows, 'No presses logged yet.');
 }
 
+const HOURLY_HEADERS = ['Time slot', 'Total Red (Avg)', 'Total Green (Avg)', 'Comments'];
+
 function buildHourlySection(entries, emptyMessage) {
+  if (entries.length === 0) {
+    return buildAggregateTable(HOURLY_HEADERS, [], emptyMessage);
+  }
+
   const { totals, n } = computeHourlyTotals(entries);
-  const rows = entries.length === 0 ? [] : HOUR_BUCKETS.map(b => {
+  const table = document.createElement('table');
+  table.appendChild(buildTableHead(HOURLY_HEADERS));
+
+  const tbody = document.createElement('tbody');
+  for (const b of HOUR_BUCKETS) {
     const t = totals[b];
-    return [
-      `${b}–${b + 3} h`,
-      t.red ? `${t.red} (${(t.red / n).toFixed(2)})` : '0',
-      t.green ? `${t.green} (${(t.green / n).toFixed(2)})` : '0',
-      t.commentEntries.length || '',
-    ];
-  });
-  return buildAggregateTable(['Time slot', 'Total Red (Avg)', 'Total Green (Avg)', 'Comments'], rows, emptyMessage);
+    const tr = document.createElement('tr');
+    const tCell = document.createElement('td');
+    tCell.textContent = `${b}–${b + 3} h`;
+    const rCell = document.createElement('td');
+    rCell.className = 'red-cell';
+    rCell.textContent = t.red ? `${t.red} (${(t.red / n).toFixed(2)})` : '0';
+    const gCell = document.createElement('td');
+    gCell.className = 'green-cell';
+    gCell.textContent = t.green ? `${t.green} (${(t.green / n).toFixed(2)})` : '0';
+    const cCell = document.createElement('td');
+    cCell.textContent = t.commentEntries.length || '';
+    tr.append(tCell, rCell, gCell, cCell);
+    tbody.appendChild(tr);
+
+    for (const e of t.commentEntries) {
+      const dtr = document.createElement('tr');
+      dtr.className = 'comment-row';
+
+      const dtCell = document.createElement('td');
+      dtCell.textContent = `${e.date} ${e.time}`;
+      dtCell.className = 'comment-time';
+
+      const drCell = document.createElement('td');
+      drCell.className = 'red-cell';
+      if (e.button === 'red') drCell.textContent = '×';
+
+      const dgCell = document.createElement('td');
+      dgCell.className = 'green-cell';
+      if (e.button === 'green') dgCell.textContent = '×';
+
+      const dcCell = document.createElement('td');
+      dcCell.textContent = e.comment;
+      dcCell.className = 'comment-text';
+
+      dtr.append(dtCell, drCell, dgCell, dcCell);
+      tbody.appendChild(dtr);
+    }
+  }
+  table.appendChild(tbody);
+  return [table];
 }
 
 function buildPdfReport(log) {
