@@ -151,6 +151,14 @@ function renderHourlySection(tableId, bodyId, emptyId, entries) {
   if (hasData) fillHourlyTable(bodyId, entries);
 }
 
+let logExpanded = false;
+
+function applyLogExpansion() {
+  document.querySelectorAll('.log-section').forEach(d => { d.open = logExpanded; });
+  document.querySelectorAll('.comment-row').forEach(r => r.classList.toggle('hidden', !logExpanded));
+  document.querySelectorAll('.comment-toggle').forEach(c => c.classList.toggle('open', logExpanded));
+}
+
 function computeDailyTotals(log) {
   const byDate = {};
 
@@ -222,6 +230,8 @@ async function renderTable() {
   renderHourlySection('hourly-table', 'hourly-body', null, log);
   renderHourlySection('hourly-weekday-table', 'hourly-weekday-body', 'hourly-weekday-empty', weekdays);
   renderHourlySection('hourly-weekend-table', 'hourly-weekend-body', 'hourly-weekend-empty', weekends);
+
+  applyLogExpansion();
 }
 
 async function renderExport() {
@@ -362,6 +372,13 @@ document.querySelector('.export-buttons').addEventListener('click', e => {
   const btn = e.target.closest('.export-btn');
   if (!btn) return;
   EXPORTERS[btn.dataset.export]?.();
+});
+
+const expandAllBtn = document.getElementById('expand-all-btn');
+expandAllBtn.addEventListener('click', () => {
+  logExpanded = !logExpanded;
+  applyLogExpansion();
+  expandAllBtn.textContent = logExpanded ? 'Collapse all' : 'Expand all';
 });
 
 const helpBtn = document.getElementById('help-btn');

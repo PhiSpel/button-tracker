@@ -124,6 +124,24 @@ body {
   padding: 16px;
 }
 
+.log-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+
+.log-toolbar-btn {
+  padding: 8px 16px;
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
 .log-section {
   margin-bottom: 12px;
 }
@@ -285,6 +303,40 @@ td {
 
 .export-btn:active {
   opacity: 0.7;
+}
+
+/* ── Printing the Log page ── */
+
+@media print {
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+
+  .tabs,
+  .log-toolbar,
+  .help-btn,
+  .modal-overlay {
+    display: none !important;
+  }
+
+  html, body, .app, .page.active, #page-log {
+    width: auto !important;
+    height: auto !important;
+    max-height: none !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    display: block !important;
+    position: static !important;
+  }
+
+  .log-section {
+    break-before: page;
+  }
+
+  .log-section:first-child {
+    break-before: auto;
+  }
 }
 
 /* ── Help button ── */
