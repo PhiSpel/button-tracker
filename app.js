@@ -415,33 +415,36 @@ async function exportPdfReport() {
   const log = await getAllEntries();
   if (log.length === 0) return;
 
-  const report = document.getElementById('pdf-report');
-  report.innerHTML = '';
-  report.append(...buildPdfReport(log));
+  // Print from a dedicated iframe whose entire document is the report,
+  // rather than toggling visibility of the main page and printing that.
+  // Some browsers (observed in Firefox) snapshot the wrong layout for the
+  // actual saved PDF when the main document's content is mutated just
+  // before window.print() is called, even though the live print preview
+  // looks correct. Giving print() a self-contained document with nothing
+  // else on it avoids that class of bug entirely.
+  const iframe = document.createElement('iframe');
+  iframe.style.position = 'fixed';
+  iframe.style.width = '0';
+  iframe.style.height = '0';
+  iframe.style.border = '0';
+  document.body.appendChild(iframe);
 
-  document.body.classList.add('printing-report');
+  const doc = iframe.contentDocument;
+  doc.open();
+  doc.write(`<!DOCTYPE html><html><head><link rel="stylesheet" href="${location.origin}/style.css"></head><body></body></html>`);
+  doc.close();
 
-  // Give the browser a chance to paint the new layout before printing —
-  // calling window.print() synchronously right after the DOM mutation can
-  // make some browsers (e.g. Firefox) snapshot the page for the actual
-  // print/PDF output before the change has taken effect, even though the
-  // print preview itself re-renders live.
-  await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  for (const section of buildPdfReport(log)) {
+    doc.body.appendChild(doc.importNode(section, true));
+  }
 
-  window.print();
+  iframe.contentWindow.focus();
+  iframe.contentWindow.print();
+
+  iframe.contentWindow.addEventListener('afterprint', () => {
+    iframe.remove();
+  });
 }
-
-window.addEventListener('afterprint', () => {
-  // Firefox fires 'afterprint' as soon as the print dialog closes, but the
-  // actual PDF file (when "Save to PDF" is chosen) is rendered asynchronously
-  // afterwards. Removing the printing-report class right away can make that
-  // later render pass run against the normal screen layout instead of the
-  // report, producing a PDF of the export page plus blank pages. Delay the
-  // cleanup so the async render has time to use the correct layout.
-  setTimeout(() => {
-    document.body.classList.remove('printing-report');
-  }, 2000);
-});
 
 async function exportCSV() {
   const log = await getAllEntries();

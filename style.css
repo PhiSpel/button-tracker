@@ -289,34 +289,16 @@ td {
 
 /* ── Print report ── */
 
-#pdf-report {
-  display: none;
-}
-
-#pdf-report .pdf-section {
+.pdf-section {
   margin-bottom: 24px;
 }
 
-#pdf-report h2 {
+.pdf-section h2 {
   font-size: 18px;
   margin-bottom: 8px;
 }
 
 @media print {
-  html, body {
-    height: auto !important;
-    display: block !important;
-    overflow: visible !important;
-  }
-
-  body.printing-report > *:not(#pdf-report) {
-    display: none !important;
-  }
-
-  body.printing-report #pdf-report {
-    display: block !important;
-  }
-
   .pdf-section {
     break-before: page;
   }
