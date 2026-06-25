@@ -308,6 +308,11 @@ td {
 /* ── Printing the Log page ── */
 
 @media print {
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+
   .tabs,
   .log-toolbar,
   .help-btn,
@@ -316,9 +321,13 @@ td {
   }
 
   html, body, .app, .page.active, #page-log {
+    width: auto !important;
     height: auto !important;
+    max-height: none !important;
+    min-height: 0 !important;
     overflow: visible !important;
     display: block !important;
+    position: static !important;
   }
 
   .log-section {
