@@ -94,7 +94,13 @@
     </section>
     <section id="page-export" class="page">
       <p id="export-count" class="export-count"></p>
-      <button class="export-btn">Export CSV</button>
+      <div class="export-buttons">
+        <button class="export-btn" data-export="raw">Export Raw Log CSV</button>
+        <button class="export-btn" data-export="daily">Export Daily Logs CSV</button>
+        <button class="export-btn" data-export="hourly">Export 3-Hourly CSV</button>
+        <button class="export-btn" data-export="hourly-weekday">Export 3-Hourly Weekdays CSV</button>
+        <button class="export-btn" data-export="hourly-weekend">Export 3-Hourly Weekends CSV</button>
+      </div>
       <p id="export-empty" class="empty hidden">No data to export yet.</p>
     </section>
   </div>
