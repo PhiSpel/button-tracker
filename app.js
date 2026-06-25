@@ -424,8 +424,13 @@ async function exportPdfReport() {
   // else on it avoids that class of bug entirely.
   const iframe = document.createElement('iframe');
   iframe.style.position = 'fixed';
-  iframe.style.width = '0';
-  iframe.style.height = '0';
+  // Firefox refuses to print a zero-size iframe and silently falls back to
+  // printing the parent document instead. Give it real dimensions and move
+  // it off-screen rather than collapsing it to 0x0.
+  iframe.style.width = '800px';
+  iframe.style.height = '600px';
+  iframe.style.left = '-10000px';
+  iframe.style.top = '0';
   iframe.style.border = '0';
   document.body.appendChild(iframe);
 
