@@ -262,6 +262,14 @@ td {
   color: #6e6e73;
 }
 
+.export-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 320px;
+}
+
 .export-btn {
   padding: 16px 40px;
   background: #000;
