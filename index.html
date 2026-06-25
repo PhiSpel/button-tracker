@@ -28,6 +28,10 @@
     </main>
 
     <section id="page-log" class="page">
+      <div class="log-toolbar">
+        <button id="expand-all-btn" class="log-toolbar-btn">Expand all</button>
+      </div>
+
       <details class="log-section">
         <summary>Daily logs</summary>
         <table id="log-table" class="hidden">
@@ -95,7 +99,6 @@
     <section id="page-export" class="page">
       <p id="export-count" class="export-count"></p>
       <div class="export-buttons">
-        <button class="export-btn" data-export="pdf-report">Print Overview</button>
         <button class="export-btn" data-export="raw">Export Raw Log CSV</button>
         <button class="export-btn" data-export="daily">Export Daily Logs CSV</button>
         <button class="export-btn" data-export="hourly">Export 3-Hourly CSV</button>

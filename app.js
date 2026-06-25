@@ -151,6 +151,14 @@ function renderHourlySection(tableId, bodyId, emptyId, entries) {
   if (hasData) fillHourlyTable(bodyId, entries);
 }
 
+let logExpanded = false;
+
+function applyLogExpansion() {
+  document.querySelectorAll('.log-section').forEach(d => { d.open = logExpanded; });
+  document.querySelectorAll('.comment-row').forEach(r => r.classList.toggle('hidden', !logExpanded));
+  document.querySelectorAll('.comment-toggle').forEach(c => c.classList.toggle('open', logExpanded));
+}
+
 function computeDailyTotals(log) {
   const byDate = {};
 
@@ -222,6 +230,8 @@ async function renderTable() {
   renderHourlySection('hourly-table', 'hourly-body', null, log);
   renderHourlySection('hourly-weekday-table', 'hourly-weekday-body', 'hourly-weekday-empty', weekdays);
   renderHourlySection('hourly-weekend-table', 'hourly-weekend-body', 'hourly-weekend-empty', weekends);
+
+  applyLogExpansion();
 }
 
 async function renderExport() {
@@ -291,172 +301,6 @@ function buildHourlyCSV(entries) {
   return rows;
 }
 
-function buildTableHead(headers) {
-  const thead = document.createElement('thead');
-  const headRow = document.createElement('tr');
-  for (const h of headers) {
-    const th = document.createElement('th');
-    th.textContent = h;
-    headRow.appendChild(th);
-  }
-  thead.appendChild(headRow);
-  return thead;
-}
-
-function buildAggregateTable(headers, rows, emptyMessage) {
-  const table = document.createElement('table');
-  table.appendChild(buildTableHead(headers));
-
-  const tbody = document.createElement('tbody');
-  for (const cells of rows) {
-    const tr = document.createElement('tr');
-    cells.forEach((cell, i) => {
-      const td = document.createElement('td');
-      td.textContent = cell;
-      if (i === 1) td.className = 'red-cell';
-      if (i === 2) td.className = 'green-cell';
-      tr.appendChild(td);
-    });
-    tbody.appendChild(tr);
-  }
-  table.appendChild(tbody);
-
-  if (rows.length === 0) {
-    const p = document.createElement('p');
-    p.className = 'section-empty';
-    p.textContent = emptyMessage;
-    return [table, p];
-  }
-  return [table];
-}
-
-function buildDailySection(log) {
-  const { byDate, dates } = computeDailyTotals(log);
-  const rows = dates.map(date => [date, byDate[date].red, byDate[date].green, byDate[date].comments || '']);
-  return buildAggregateTable(['Date', 'Red', 'Green', 'Comments'], rows, 'No presses logged yet.');
-}
-
-const HOURLY_HEADERS = ['Time slot', 'Total Red (Avg)', 'Total Green (Avg)', 'Comments'];
-
-function buildHourlySection(entries, emptyMessage) {
-  if (entries.length === 0) {
-    return buildAggregateTable(HOURLY_HEADERS, [], emptyMessage);
-  }
-
-  const { totals, n } = computeHourlyTotals(entries);
-  const table = document.createElement('table');
-  table.appendChild(buildTableHead(HOURLY_HEADERS));
-
-  const tbody = document.createElement('tbody');
-  for (const b of HOUR_BUCKETS) {
-    const t = totals[b];
-    const tr = document.createElement('tr');
-    const tCell = document.createElement('td');
-    tCell.textContent = `${b}–${b + 3} h`;
-    const rCell = document.createElement('td');
-    rCell.className = 'red-cell';
-    rCell.textContent = t.red ? `${t.red} (${(t.red / n).toFixed(2)})` : '0';
-    const gCell = document.createElement('td');
-    gCell.className = 'green-cell';
-    gCell.textContent = t.green ? `${t.green} (${(t.green / n).toFixed(2)})` : '0';
-    const cCell = document.createElement('td');
-    cCell.textContent = t.commentEntries.length || '';
-    tr.append(tCell, rCell, gCell, cCell);
-    tbody.appendChild(tr);
-
-    for (const e of t.commentEntries) {
-      const dtr = document.createElement('tr');
-      dtr.className = 'comment-row';
-
-      const dtCell = document.createElement('td');
-      dtCell.textContent = `${e.date} ${e.time}`;
-      dtCell.className = 'comment-time';
-
-      const drCell = document.createElement('td');
-      drCell.className = 'red-cell';
-      if (e.button === 'red') drCell.textContent = '×';
-
-      const dgCell = document.createElement('td');
-      dgCell.className = 'green-cell';
-      if (e.button === 'green') dgCell.textContent = '×';
-
-      const dcCell = document.createElement('td');
-      dcCell.textContent = e.comment;
-      dcCell.className = 'comment-text';
-
-      dtr.append(dtCell, drCell, dgCell, dcCell);
-      tbody.appendChild(dtr);
-    }
-  }
-  table.appendChild(tbody);
-  return [table];
-}
-
-function buildPdfReport(log) {
-  const { weekdays, weekends } = splitWeekdayWeekend(log);
-  const sections = [
-    ['Daily logs', buildDailySection(log)],
-    ['3-Hourly', buildHourlySection(log, 'No presses logged yet.')],
-    ['3-hourly weekdays', buildHourlySection(weekdays, 'No weekday data yet.')],
-    ['3-hourly weekends', buildHourlySection(weekends, 'No weekend data yet.')],
-  ];
-
-  return sections.map(([title, children]) => {
-    const section = document.createElement('section');
-    section.className = 'pdf-section';
-    const h2 = document.createElement('h2');
-    h2.textContent = title;
-    section.append(h2, ...children);
-    return section;
-  });
-}
-
-async function exportPdfReport() {
-  const log = await getAllEntries();
-  if (log.length === 0) return;
-
-  // Print from a dedicated iframe whose entire document is the report,
-  // rather than toggling visibility of the main page and printing that.
-  // Some browsers (observed in Firefox) snapshot the wrong layout for the
-  // actual saved PDF when the main document's content is mutated just
-  // before window.print() is called, even though the live print preview
-  // looks correct. Giving print() a self-contained document with nothing
-  // else on it avoids that class of bug entirely.
-  const iframe = document.createElement('iframe');
-  iframe.style.position = 'fixed';
-  // Firefox refuses to print a zero-size iframe and silently falls back to
-  // printing the parent document instead. Give it real dimensions and move
-  // it off-screen rather than collapsing it to 0x0.
-  iframe.style.width = '800px';
-  iframe.style.height = '600px';
-  iframe.style.left = '-10000px';
-  iframe.style.top = '0';
-  iframe.style.border = '0';
-
-  // Use srcdoc + load, not document.write, and wait for the iframe to
-  // actually finish loading (including its stylesheet) before printing.
-  // document.write-built iframe documents are unreliable to print in
-  // Firefox — there's no real navigation/load cycle for it to settle on
-  // before print() runs, which can make it print the parent page instead.
-  await new Promise(resolve => {
-    iframe.addEventListener('load', resolve, { once: true });
-    iframe.srcdoc = `<!DOCTYPE html><html><head><link rel="stylesheet" href="${location.origin}/style.css"></head><body></body></html>`;
-    document.body.appendChild(iframe);
-  });
-
-  const doc = iframe.contentDocument;
-  for (const section of buildPdfReport(log)) {
-    doc.body.appendChild(doc.importNode(section, true));
-  }
-
-  iframe.contentWindow.focus();
-  iframe.contentWindow.print();
-
-  iframe.contentWindow.addEventListener('afterprint', () => {
-    iframe.remove();
-  });
-}
-
 async function exportCSV() {
   const log = await getAllEntries();
   if (log.length === 0) return;
@@ -517,7 +361,6 @@ document.querySelector('.btn-red').addEventListener('click', () => logPress('red
 document.querySelector('.btn-green').addEventListener('click', () => logPress('green'));
 
 const EXPORTERS = {
-  'pdf-report': exportPdfReport,
   raw: exportCSV,
   daily: exportDailyCSV,
   hourly: exportHourlyCSV,
@@ -529,6 +372,13 @@ document.querySelector('.export-buttons').addEventListener('click', e => {
   const btn = e.target.closest('.export-btn');
   if (!btn) return;
   EXPORTERS[btn.dataset.export]?.();
+});
+
+const expandAllBtn = document.getElementById('expand-all-btn');
+expandAllBtn.addEventListener('click', () => {
+  logExpanded = !logExpanded;
+  applyLogExpansion();
+  expandAllBtn.textContent = logExpanded ? 'Collapse all' : 'Expand all';
 });
 
 const helpBtn = document.getElementById('help-btn');
