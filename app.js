@@ -432,13 +432,19 @@ async function exportPdfReport() {
   iframe.style.left = '-10000px';
   iframe.style.top = '0';
   iframe.style.border = '0';
-  document.body.appendChild(iframe);
+
+  // Use srcdoc + load, not document.write, and wait for the iframe to
+  // actually finish loading (including its stylesheet) before printing.
+  // document.write-built iframe documents are unreliable to print in
+  // Firefox — there's no real navigation/load cycle for it to settle on
+  // before print() runs, which can make it print the parent page instead.
+  await new Promise(resolve => {
+    iframe.addEventListener('load', resolve, { once: true });
+    iframe.srcdoc = `<!DOCTYPE html><html><head><link rel="stylesheet" href="${location.origin}/style.css"></head><body></body></html>`;
+    document.body.appendChild(iframe);
+  });
 
   const doc = iframe.contentDocument;
-  doc.open();
-  doc.write(`<!DOCTYPE html><html><head><link rel="stylesheet" href="${location.origin}/style.css"></head><body></body></html>`);
-  doc.close();
-
   for (const section of buildPdfReport(log)) {
     doc.body.appendChild(doc.importNode(section, true));
   }
