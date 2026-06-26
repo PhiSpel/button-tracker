@@ -381,6 +381,10 @@ expandAllBtn.addEventListener('click', () => {
   expandAllBtn.textContent = logExpanded ? 'Collapse all' : 'Expand all';
 });
 
+document.getElementById('print-log-btn').addEventListener('click', () => {
+  window.print();
+});
+
 const helpBtn = document.getElementById('help-btn');
 const modalOverlay = document.getElementById('modal-overlay');
 const modalClose = document.getElementById('modal-close');
